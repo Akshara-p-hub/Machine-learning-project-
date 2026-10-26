@@ -1,0 +1,73 @@
+# MACHINE LEARNING PROJECT
+# Student Pass/Fail Prediction using Logistic Regression
+
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# 1. Dataset
+# Input: Hours studied
+# Output: 0 = Fail, 1 = Pass
+
+X = np.array([
+    [1], [2], [3], [4], [5],
+    [6], [7], [8], [9], [10],
+    [2.5], [3.5], [4.5], [5.5], [6.5],
+    [7.5], [8.5], [9.5], [1.5], [5.8]
+])
+
+y = np.array([
+    0, 0, 0, 0, 0,
+    1, 1, 1, 1, 1,
+    0, 0, 0, 1, 1,
+    1, 1, 1, 0, 1
+])
+
+# 2. Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y
+)
+
+# 3. Train the Machine Learning model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# 4. Evaluate the model
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+print("=" * 45)
+print(" STUDENT PASS/FAIL PREDICTION SYSTEM")
+print("=" * 45)
+
+print(f"\nModel Accuracy: {accuracy * 100:.2f}%")
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nClassification Report:")
+print(classification_report(
+    y_test, y_pred, target_names=["Fail", "Pass"], zero_division=0
+))
+
+# 5. Predict the result for a new student
+try:
+    hours = float(input("\nEnter student's study hours: "))
+
+    if hours < 0:
+        print("Study hours cannot be negative.")
+    else:
+        new_student = np.array([[hours]])
+
+        prediction = model.predict(new_student)[0]
+        probabilities = model.predict_proba(new_student)[0]
+
+        print("\n----- PREDICTION RESULT -----")
+        print(f"Study Hours: {hours}")
+        print("Predicted Result:", "PASS" if prediction == 1 else "FAIL")
+        print(f"Probability of Passing: {probabilities[1] * 100:.2f}%")
+        print(f"Probability of Failing: {probabilities[0] * 100:.2f}%")
+
+except ValueError:
+    print("Please enter a valid number.")
